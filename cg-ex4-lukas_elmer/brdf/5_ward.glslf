@@ -32,7 +32,8 @@ void main() {
         vec3 H = (L + V) / length(L + V); // halfway vector between L and V
         vec3 vertexToLightSource = L;
 
-        vec3 viewDirection = L;
+        vec3 viewDirection = normalize(-pos);
+        //vec3 viewDirection = L;
         vec3 lightDirection;
         float attenuation;
 
