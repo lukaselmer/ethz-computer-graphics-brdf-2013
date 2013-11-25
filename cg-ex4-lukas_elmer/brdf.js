@@ -44,9 +44,9 @@ function init() {
 	for(i = 0 ; i < shadersList.length ; ++i) {
 		addShader(shadersList[i]);
 	}
-	
+
 	// import (asynchronously) and compile all the shaders present in the header
-	SHADER_LOADER.load( 
+	SHADER_LOADER.load(
 		function(data)
 		{
 			for(var i = 0 ; i < shadersList.length ; ++i) {
@@ -58,9 +58,9 @@ function init() {
 			selectShader(0);
 		}
 	);
-	
+
 	showShader(); // enable code editor
-	
+
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.enable(gl.DEPTH_TEST);
 	gl.depthFunc(gl.LEQUAL);
@@ -79,19 +79,19 @@ function init() {
 // create the script tags, so that the shaders can be loaded by AJAX
 function addShader(name) {
 	var shaderTag;
-	
+
 	shaderTag = document.createElement('script');
 	shaderTag.setAttribute("data-src","brdf/"+name+".glslv");
 	shaderTag.setAttribute("data-name",name);
 	shaderTag.setAttribute("type","x-shader/x-vertex");
 	document.getElementsByTagName('head')[0].appendChild(shaderTag);
-	
+
 	shaderTag = document.createElement('script');
 	shaderTag.setAttribute("data-src","brdf/"+name+".glslf");
 	shaderTag.setAttribute("data-name",name);
 	shaderTag.setAttribute("type","x-shader/x-fragment");
 	document.getElementsByTagName('head')[0].appendChild(shaderTag);
-	
+
 	var select = document.getElementById("shaderSelector").options;
 	select[select.length] = new Option(name);
 }
@@ -107,7 +107,7 @@ function selectShader(idx) {
 function compileShader() {
 	shaders[currentShader].vertex = document.getElementById('editor_vshader').value;
 	shaders[currentShader].fragment = document.getElementById('editor_fshader').value;
-	
+
 	var shader = shaders[currentShader].program;
 
 	// disable all enabled vertex array objects before switching to the new shader
@@ -122,7 +122,7 @@ function compileShader() {
 
 	shaders[currentShader].program = createProgram(shaders[currentShader].vertex,shaders[currentShader].fragment);
 	shader = shaders[currentShader].program;
-	
+
 	if(shaders[currentShader].program) {
 		gl.useProgram(shaders[currentShader].program);
 
@@ -195,7 +195,7 @@ function switchShader(newShaderIndex) {
 
 		currentShader = newShaderIndex;
 		shader = shaders[currentShader].program;
-		
+
 		if(shader) {
 			gl.useProgram(shader);
 
@@ -301,7 +301,7 @@ function reshape() {
 		canvas.style.left = '0px';
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
-	}	
+	}
 	display();
 }
 
@@ -402,23 +402,27 @@ function keyboard(event) {
 
 	// returning false prevents further propagation of the event
 
-	if (keyStr == " ") {
-		currentMaterial = (currentMaterial + 1) % materials.length;
-		return false;
-	} else if (keyCode == 13) {
-		showTeapot = !showTeapot;
-		return false;
-	} else if (keyStr.toLowerCase() == "e") {
-		exportPNG();
-		return false;
-	} else if (keyStr.toLowerCase() == "h") {
-		showMessage("************************");
-		showMessage("<enter>: change model");
-		showMessage("<space>: change material");
-		showMessage("<mouse drag>: rotate");
-		showMessage("e: export as image");
-		showMessage("************************");
-	}
+    if(event.ctrlKey){
+        if (keyStr == " ") {
+            currentMaterial = (currentMaterial + 1) % materials.length;
+            return false;
+        } else if (keyCode == 13) {
+            showTeapot = !showTeapot;
+            return false;
+        } else if (keyStr.toLowerCase() == "e") {
+            exportPNG();
+            return false;
+        } else if (keyStr.toLowerCase() == "h") {
+            showMessage("************************");
+            showMessage("<enter>: change model");
+            showMessage("<space>: change material");
+            showMessage("<mouse drag>: rotate");
+            showMessage("e: export as image");
+            showMessage("************************");
+        }
+    }else {
+        return false;
+    }
 }
 
 // helper functions
@@ -442,7 +446,7 @@ function exportShaders() {
 	document.getElementById("exportLink").href = "data:text/plain;base64," + btoa(document.getElementById("editor_fshader").value);
 	document.getElementById("exportLink").download = "custom.glslf";	// not supported by safari yet
 	document.getElementById("exportLink").click();
-	
+
 	document.getElementById("exportLink").href = "data:text/plain;base64," + btoa(document.getElementById("editor_vshader").value);
 	document.getElementById("exportLink").download = "custom.glslv";	// not supported by safari yet
 	document.getElementById("exportLink").click();
@@ -474,7 +478,7 @@ function initGL(canvas) {
 }
 
 function createProgram(vShader,fShader) {
-	
+
 	// compile vertex code
 	var vertexShader = gl.createShader(gl.VERTEX_SHADER);
 	gl.shaderSource(vertexShader, vShader);
@@ -484,7 +488,7 @@ function createProgram(vShader,fShader) {
 		alert("[Shader compile error]\n" + gl.getShaderInfoLog(vertexShader));
 		return null;
 	}
-	
+
 	// compile fragment code
 	var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 	gl.shaderSource(fragmentShader, fShader);

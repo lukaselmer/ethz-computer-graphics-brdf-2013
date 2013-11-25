@@ -20,24 +20,26 @@ vec3 getAmbient(){
     return globalAmbientLightColor * materialAmbientColor;
 }
 
-void addDiffuseAndSpecularHighlights(inout vec3 color){
+void addDiffuse(inout vec3 color){
     vec3 pos = vP.xyz;
     vec3 N = normalize(vN);
     for (int i = 0; i < LIGHTS; i++) {
         vec3 L = normalize(lightPosition[i]-pos); // vector from point to light
 
+        // diffuse color
         color += materialDiffuseColor * max(0.0, dot(L, N)) * lightColor[i];
 
-        if (materialShininess <= 0.0) continue; // continue unless there are specular highlights
-
-        vec3 V = normalize(-pos); // vector from point to camera
-        vec3 H = (L + V) / length(L + V); // halfway vector between L and V
-        color += materialSpecularColor * pow(max(0.0,dot(N, H)), materialShininess) * lightColor[i];
+        // specular highlights
+        if (materialShininess > 0.0) {
+            vec3 R = normalize(reflect(-L, N)); // vector of reflected light
+            vec3 V = normalize(-pos); // vector from point to camera
+            color += materialSpecularColor * pow(max(0.0,dot(R, V)), materialShininess) * lightColor[i];
+        }
     }
 }
 
 void main() {
     vec3 color = getAmbient();
-    addDiffuseAndSpecularHighlights(color);
-    gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
+    addDiffuse(color);
+	gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
 }
