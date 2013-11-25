@@ -3,7 +3,7 @@
   <head>
     <title>Exercise 4: BRDF and Procedural Textures</title>
     <link rel="stylesheet" type="text/css" href="brdf.css"/>
-	
+
     <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="ShaderLoader.min.js"></script>
     <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
@@ -59,57 +59,68 @@
     uniform vec3 globalAmbientLightColor;
 
     -->
-	
+
 	<!--
 		how to include your shader files?
-		
+
 		create a vertex and a fragment shader file in the "brdf" folder
 		(for example "shader_name.glslv" and "shader_name.glslf")
 		(you can copy'n'paste the ambient example)
-		
+
 		add a line here:
 			shadersList.push("name_of_the_files_without_extension");
 	-->
 	<script type="text/javascript">
-		shadersList.push("ambient");
+		shadersList.push("0_ambient");
+        shadersList.push("1_lambertian");
+        shadersList.push("2_phong");
+        shadersList.push("3_blinn");
+        shadersList.push("4_blinn");
+        shadersList.push("5_ward");
+        shadersList.push("6_cook");
+        shadersList.push("7_svbrdf");
+        shadersList.push("a_wood");
+        shadersList.push("b_marble");
+        shadersList.push("c_earth");
+        shadersList.push("_");
 	</script>
-	
-	
+
+
   </head>
   <body onload="init();">
-  
+
 	<script language="JavaScript">
 	  window.onbeforeunload = function()
 	  {
 		return "Warning! If you have edited the shaders in the textarea, you need to export them, otherwise your work will be lost.";
 	  }
 	</script>
-    
+
     <canvas id="screen">Your browser may not support HTML5 canvas.</canvas>
     <div id="message" class="unselectable"></div>
-	
+
 	<div id="controls">
 		<button id="show_button" onclick="showShader()"></button>
-		<select id="shaderSelector" onChange="selectShader(this.selectedIndex)"></select> 
-		
+		<select id="shaderSelector" onChange="selectShader(this.selectedIndex)"></select>
+
 	</div>
-	
+
 	<div id="editor">
 		<div style="margin-top: 70px;">
 			<button id="compile_button" onclick="compileShader()">Compile shader</button> <button id="export_button" onclick="exportShaders()">Export shaders</button>
 			<br/><br/>
 			Vertex Shader: <br/>
 			<textarea id="editor_vshader">
-			
+
 			</textarea>
 			<br />
 			Fragment Shader: <br/>
 			<textarea id="editor_fshader">
-			
+
 			</textarea>
 		</div>
 	</div>
     <a id="exportLink" class="hidden"/>
-			
+
   </body>
 </html>
