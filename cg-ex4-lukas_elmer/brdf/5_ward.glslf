@@ -27,6 +27,11 @@ void main() {
 
     vec3 color = globalAmbientLightColor * materialAmbientColor;
 
+    float _AlphaX = 0.8;
+    float _AlphaY = 0.2;
+
+    vec3 binormalDirection = cross(N, tangentDirection);
+
     for (int i = 0; i < LIGHTS; i++) {
         vec3 L = normalize(lightPosition[i] - pos); // vector from point to light
         vec3 H = (L + V) / length(L + V); // halfway vector between L and V
@@ -36,11 +41,6 @@ void main() {
         //vec3 viewDirection = L;
         vec3 lightDirection;
         float attenuation;
-
-        float _AlphaX = 0.8;
-        float _AlphaY = 0.05;
-
-        // TODO: iterate over light sources
 
         if (false && length(lightPosition[i]) == 0.0) // directional light?
         {
@@ -56,7 +56,6 @@ void main() {
         }
 
         vec3 halfwayVector = normalize(lightDirection + viewDirection);
-        vec3 binormalDirection = cross(N, tangentDirection);
         float dotLN = dot(lightDirection, N); // compute this dot product only once
 
         // Diffuse color
