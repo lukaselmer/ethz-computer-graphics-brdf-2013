@@ -14,6 +14,7 @@ uniform vec3 globalAmbientLightColor;
 varying vec2 vTC;
 varying vec3 vN;
 varying vec4 vP;
+varying vec3 varyingTangentDirection;
 
 // Inspiration: https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Brushed_Metal
 
@@ -22,6 +23,7 @@ void main() {
     vec3 pos = vP.xyz;
     vec3 N = normalize(vN);
     vec3 V = normalize(-pos); // vector from point to camera
+    vec3 tangentDirection = normalize(varyingTangentDirection);
 
     vec3 color = globalAmbientLightColor * materialAmbientColor;
 
@@ -39,7 +41,7 @@ void main() {
 
         // TODO: iterate over light sources
 
-        if (lightPosition[i] == 0.0) // directional light?
+        if (false && length(lightPosition[i]) == 0.0) // directional light?
         {
            attenuation = 1.0; // no attenuation
            lightDirection = normalize(vec3(lightPosition[i]));
@@ -52,12 +54,13 @@ void main() {
            lightDirection = normalize(vertexToLightSource);
         }
 
-        vec3 halfwayVector = H; //normalize(lightDirection + viewDirection); // = H ???
-        vec3 binormalDirection = cross(N, V);
+        vec3 halfwayVector = normalize(lightDirection + viewDirection);
+        vec3 binormalDirection = cross(N, tangentDirection);
         float dotLN = dot(lightDirection, N); // compute this dot product only once
 
         // Diffuse color
         //color += attenuation * lightColor[i] * materialDiffuseColor * max(0.0, dotLN);
+        //color += attenuation * materialDiffuseColor * max(0.0, dotLN) * lightColor[i];
         color += attenuation * materialDiffuseColor * max(0.0, dotLN) * lightColor[i];
 
         if (dotLN < 0.0) continue; // light source on the wrong side => no specular reflection
@@ -65,7 +68,7 @@ void main() {
         // Specular reflection
         float dotHN = dot(halfwayVector, N);
         float dotVN = dot(viewDirection, N);
-        float dotHTAlphaX = dot(halfwayVector, V) / _AlphaX;
+        float dotHTAlphaX = dot(halfwayVector, tangentDirection) / _AlphaX;
         float dotHBAlphaY = dot(halfwayVector, binormalDirection) / _AlphaY;
 
         color += attenuation * materialSpecularColor
