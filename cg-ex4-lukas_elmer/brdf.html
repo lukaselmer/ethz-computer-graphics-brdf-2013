@@ -1,0 +1,115 @@
+<!DOCTYPE Html>
+<html>
+  <head>
+    <title>Exercise 4: BRDF and Procedural Textures</title>
+    <link rel="stylesheet" type="text/css" href="brdf.css"/>
+	
+    <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="ShaderLoader.min.js"></script>
+    <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+    <script type="text/javascript" src="teapot.js"></script>
+    <script type="text/javascript" src="sphere.js"></script>
+    <script type="text/javascript" src="brdf.js"></script>
+
+    <!--
+    define material properties
+
+    modify the two sets of meterial properties to best replicate the given materials
+    -->
+
+    <script type="text/javascript">
+      // be warned that objects are not copied, but their references.
+      var WHITE3 = new Float32Array([1, 1, 1]);
+      var RED3 = new Float32Array([1, 0.5, 0.5]);
+      var BLUE3 = new Float32Array([.7, .7, 1]);
+
+      // dummy material properties
+      var materials = new Array();
+      materials.push({ambient: RED3, diffuse: RED3, specular: WHITE3, shininess: 32.0});
+      materials.push({ambient: BLUE3, diffuse: BLUE3, specular: WHITE3, shininess: 16.0});
+
+      // you have 3 point light sources: the number of lights can be hard-coded in the shaders
+    </script>
+
+    <!--
+    define shaders
+
+    the following attributes and uniforms are set by javascript so that they can
+    be used in glsl.
+
+    // vertex attributes
+    attribute vec3 vertexPosition;
+    attribute vec3 vertexNormal;
+    attribute vec2 textureCoord;
+
+    // transformation matrices
+    uniform mat4 projectionMatrix;
+    uniform mat4 modelViewMatrix;
+    uniform mat3 normalMatrix;
+
+    // material properties
+    uniform vec3 materialAmbientColor;
+    uniform vec3 materialDiffuseColor;
+    uniform vec3 materialSpecularColor;
+    uniform float materialShininess;
+
+    // point light sources
+    uniform vec3 lightPosition[3];
+    uniform vec3 lightColor[3];
+    uniform vec3 globalAmbientLightColor;
+
+    -->
+	
+	<!--
+		how to include your shader files?
+		
+		create a vertex and a fragment shader file in the "brdf" folder
+		(for example "shader_name.glslv" and "shader_name.glslf")
+		(you can copy'n'paste the ambient example)
+		
+		add a line here:
+			shadersList.push("name_of_the_files_without_extension");
+	-->
+	<script type="text/javascript">
+		shadersList.push("ambient");
+	</script>
+	
+	
+  </head>
+  <body onload="init();">
+  
+	<script language="JavaScript">
+	  window.onbeforeunload = function()
+	  {
+		return "Warning! If you have edited the shaders in the textarea, you need to export them, otherwise your work will be lost.";
+	  }
+	</script>
+    
+    <canvas id="screen">Your browser may not support HTML5 canvas.</canvas>
+    <div id="message" class="unselectable"></div>
+	
+	<div id="controls">
+		<button id="show_button" onclick="showShader()"></button>
+		<select id="shaderSelector" onChange="selectShader(this.selectedIndex)"></select> 
+		
+	</div>
+	
+	<div id="editor">
+		<div style="margin-top: 70px;">
+			<button id="compile_button" onclick="compileShader()">Compile shader</button> <button id="export_button" onclick="exportShaders()">Export shaders</button>
+			<br/><br/>
+			Vertex Shader: <br/>
+			<textarea id="editor_vshader">
+			
+			</textarea>
+			<br />
+			Fragment Shader: <br/>
+			<textarea id="editor_fshader">
+			
+			</textarea>
+		</div>
+	</div>
+    <a id="exportLink" class="hidden"/>
+			
+  </body>
+</html>

@@ -1,0 +1,64 @@
+/* css for the brdf exercise */
+
+body { 
+	font-size: 14pt; margin: 0; padding: 0; overflow: hidden; background-color: gray; }
+
+#screen { top: 0px; position: absolute; }
+
+#message {
+	position: absolute;
+	top: 10px; right: 15px;
+	width: 250px; height: 120px;
+	color: white;
+	font-family: monospace;
+	font-size: 12px;
+	line-height: 12px;
+	/* overflow: hidden; */
+	/* background-color: red; */
+}
+
+#exportLink { display: none; }
+
+.unselectable { 
+	-moz-user-select: -moz-none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	cursor: default;
+	pointer-events: none; /* a simplistic trick that the mouse events go
+	through this layer, which works with safari, chrome, and firefox */
+}
+
+.hidden { display: none; }
+
+#controls {
+	position: absolute;
+	padding: 10px;
+	z-index: 99;
+}
+
+#editor {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	background-color: #dddddd;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#editor_vshader {
+	width: 600px;
+	height: 200px;
+}
+#editor_fshader {
+	width: 600px;
+	height: 400px;
+}
+
+button, select {
+	padding: 8px;
+	font-size: 14pt;
+	width: 300px;
+}
