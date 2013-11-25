@@ -22,8 +22,8 @@ void main() {
     vec3 pos = vP.xyz;
     vec3 n = normalize(vN);
     for (int i = 0; i < LIGHTS; ++i) {
-        vec3 lightDirection = normalize(lightPosition[i] - pos);
-        color += materialDiffuseColor * max(0.0, dot(n, lightDirection)) * lightColor[i];
+        vec3 vertexToLightSource = normalize(lightPosition[i] - pos);
+        color += materialDiffuseColor * max(0.0, dot(n, vertexToLightSource)) * lightColor[i];
     }
 
     gl_FragColor = clamp(vec4(color, 1.), 0., 1.);

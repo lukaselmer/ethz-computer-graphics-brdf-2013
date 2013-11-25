@@ -24,7 +24,7 @@ void addDiffuseAndSpecularHighlights(inout vec3 color){
     vec3 pos = vP.xyz;
     vec3 N = normalize(vN);
     for (int i = 0; i < LIGHTS; i++) {
-        vec3 L = normalize(lightPosition[i]-pos); // vector from point to light
+        vec3 L = normalize(lightPosition[i] - pos); // vector from point to light
 
         color += materialDiffuseColor * max(0.0, dot(L, N)) * lightColor[i];
 
