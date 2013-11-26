@@ -22,7 +22,7 @@ void main() {
 
     vec3 pos = vP.xyz;
     vec3 N = normalize(vN);
-    vec3 V = normalize(-pos); // vector from point to camera
+    vec3 viewDirection = normalize(-pos); // vector from point to camera
     vec3 tangentDirection = normalize(varyingTangentDirection);
 
     vec3 color = globalAmbientLightColor * materialAmbientColor;
@@ -33,34 +33,20 @@ void main() {
     vec3 binormalDirection = cross(N, tangentDirection);
 
     for (int i = 0; i < LIGHTS; i++) {
-        vec3 L = normalize(lightPosition[i] - pos); // vector from point to light
-        vec3 H = (L + V) / length(L + V); // halfway vector between L and V
-        vec3 vertexToLightSource = L;
+        vec3 vertexToLightSource = lightPosition[i] - pos;
+        vec3 lightDirection = normalize(vertexToLightSource); // vector from point to light
+        vec3 H = normalize(lightDirection + viewDirection); // halfway vector between lightDirection and viewDirection
 
-        vec3 viewDirection = normalize(-pos);
-        //vec3 viewDirection = L;
-        vec3 lightDirection;
-        float attenuation;
+        // calc attenuation for spot light source
+        float distance = length(vertexToLightSource);
+        float attenuation = 1.0 / distance; // linear attenuation
+        attenuation *= 2.0; // add more power to the light source
 
-        if (false && length(lightPosition[i]) == 0.0) // directional light?
-        {
-           attenuation = 1.0; // no attenuation
-           lightDirection = normalize(vec3(lightPosition[i]));
-        }
-        else // point or spot light
-        {
-           vec3 vertexToLightSource = vec3(lightPosition[i] - pos);
-           float distance = length(vertexToLightSource);
-           attenuation = 1.0 / distance; // linear attenuation
-           lightDirection = normalize(vertexToLightSource);
-        }
 
         vec3 halfwayVector = normalize(lightDirection + viewDirection);
         float dotLN = dot(lightDirection, N); // compute this dot product only once
 
         // Diffuse color
-        //color += attenuation * lightColor[i] * materialDiffuseColor * max(0.0, dotLN);
-        //color += attenuation * materialDiffuseColor * max(0.0, dotLN) * lightColor[i];
         color += attenuation * materialDiffuseColor * max(0.0, dotLN) * lightColor[i];
 
         if (dotLN < 0.0) continue; // light source on the wrong side => no specular reflection
