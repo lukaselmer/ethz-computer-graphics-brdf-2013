@@ -9,6 +9,8 @@ uniform vec3 lightPosition[3];
 uniform vec3 lightColor[3];
 uniform vec3 globalAmbientLightColor;
 
+uniform float currentTime;
+
 varying vec2 vTC;
 varying vec3 vN;
 varying vec4 vP;

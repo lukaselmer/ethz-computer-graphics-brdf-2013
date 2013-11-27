@@ -21,7 +21,7 @@ uniform float currentTime;
 // Inspiration: https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Brushed_Metal
 
 void main() {
-    float ax = 0.08;
+    float ax = 0.08 * abs(sin(currentTime * 1.5));
     float ay = 0.2;
     float pd = 0.15;
     float ps = 0.16;

@@ -73,7 +73,7 @@ function init() {
 	document.onkeydown = keyboard;
 	window.addEventListener('resize', reshape, false);
 
-	animate();
+    requestAnimFrame(animate);
 }
 
 // create the script tags, so that the shaders can be loaded by AJAX
@@ -118,6 +118,8 @@ function compileShader() {
 			gl.disableVertexAttribArray(shader.vertexNormalAttribute);
 		if (shader.textureCoordAttribute >= 0)
 			gl.disableVertexAttribArray(shader.textureCoordAttribute);
+        if (shader.textureCoordAttribute >= 0)
+            gl.disableVertexAttribArray(shader.currentTimeAttribute);
 	}
 
 	shaders[currentShader].program = createProgram(shaders[currentShader].vertex,shaders[currentShader].fragment);
@@ -133,6 +135,8 @@ function compileShader() {
 			gl.enableVertexAttribArray(shader.vertexNormalAttribute);
 		if (shader.textureCoordAttribute >= 0)
 			gl.enableVertexAttribArray(shader.textureCoordAttribute);
+        if (shader.textureCoordAttribute >= 0)
+            gl.enableVertexAttribArray(shader.currentTimeAttribute);
 	}
 }
 
@@ -151,7 +155,7 @@ function setTransformationMatrices() {
 	} catch(e) {}
 }
 
-function setMaterialProperties() {
+function setMaterialProperties(currentTime) {
 	try {
 		var m = materials[currentMaterial];
 		var s = shaders[currentShader].program;
@@ -159,6 +163,8 @@ function setMaterialProperties() {
 		gl.uniform3fv(s.diffuseColorUniform, m.diffuse);
 		gl.uniform3fv(s.specularColorUniform, m.specular);
 		gl.uniform1f(s.materialShininessUniform, m.shininess);
+        gl.uniform1f(s.currentTimeAttribute, currentTime);
+
 	} catch(e) {}
 }
 
@@ -238,6 +244,9 @@ function locateAttribsAndUniforms(shaderProgram) {
 	shaderProgram.specularColorUniform = gl.getUniformLocation(shaderProgram, "materialSpecularColor");
 	shaderProgram.materialShininessUniform = gl.getUniformLocation(shaderProgram, "materialShininess");
 
+    // For animations
+    shaderProgram.currentTimeAttribute = gl.getUniformLocation(shaderProgram, "currentTime");
+
 	// get uniform locations for lights
 	shaderProgram.pointLightingLocationUniform = new Array();
 	shaderProgram.pointLightingColorUniform = new Array();
@@ -251,7 +260,7 @@ function locateAttribsAndUniforms(shaderProgram) {
 		gl.getUniformLocation(shaderProgram, "globalAmbientLightColor");
 }
 
-function display() {
+function display(delta, currentTime) {
 	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -277,7 +286,7 @@ function display() {
 	mat4.lookAt([0, 0, 10], [0, 0, 0], [0, 1, 0], mvMatrix);
 	mat4.multiply(mvMatrix, rotationMatrix);
 
-	setMaterialProperties();
+	setMaterialProperties(currentTime);
 	setLights();
 
 	// make two objects look in a similar scale
@@ -302,13 +311,22 @@ function reshape() {
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 	}
-	display();
+	display(-1/60, 0);
 }
 
+
+var animateLastTime = 0;
+
 // keep it responsive!
-function animate() {
-	requestAnimFrame(animate);
-	display();
+function animate(currentTime) {
+    requestAnimFrame(animate);
+
+    var lastTime = animateLastTime;
+    lastTime = lastTime || currentTime - 1000 / 60;
+    var deltaMsec = Math.min(200, currentTime - lastTime);
+    lastTime = currentTime;
+
+    display(deltaMsec / 1000, currentTime / 1000);
 }
 
 // manage model-view matrix stack
