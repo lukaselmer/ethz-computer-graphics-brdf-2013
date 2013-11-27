@@ -421,7 +421,7 @@ function keyboard(event) {
             showMessage("************************");
         }
     }else {
-        return false;
+        return true;
     }
 }
 

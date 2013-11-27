@@ -18,7 +18,7 @@
     modify the two sets of meterial properties to best replicate the given materials
     -->
 
-    <script type="text/javascript">
+    <script>
         // be warned that objects are not copied, but their references.
         var WHITE3 = new Float32Array([1, 1, 1]);
         var RED3 = new Float32Array([1, 0.5, 0.5]);
@@ -71,7 +71,7 @@
         add a line here:
             shadersList.push("name_of_the_files_without_extension");
     -->
-    <script type="text/javascript">
+    <script>
         shadersList.push("0_tmp");
         shadersList.push("1_ambient");
         shadersList.push("2_lambertian");
@@ -90,10 +90,12 @@
 </head>
 <body onload="init();">
 
-<script language="JavaScript">
-    window.onbeforeunload = function () {
+<script>
+    /*window.onbeforeunload = function () {
         return "Warning! If you have edited the shaders in the textarea, you need to export them, otherwise your work will be lost.";
-    }
+    }*/
+    $(document).ready(showShader);
+
 </script>
 
 <canvas id="screen">Your browser may not support HTML5 canvas.</canvas>
