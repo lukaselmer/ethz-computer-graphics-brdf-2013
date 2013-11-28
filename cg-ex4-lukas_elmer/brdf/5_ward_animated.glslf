@@ -21,11 +21,11 @@ uniform float currentTime;
 // Inspiration: https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Brushed_Metal
 
 void main() {
-    float ax = 0.08;
+    float ax = 0.08 * abs(sin(currentTime * 1.5));
     float ay = 0.2;
     float pd = 0.15;
     float ps = 0.16;
-    float PI = 3.141;
+    float PI = 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628;
 
 
     vec3 pos = vP.xyz;

@@ -19,17 +19,27 @@
     -->
 
     <script>
-        // be warned that objects are not copied, but their references.
-        var WHITE3 = new Float32Array([1, 1, 1]);
-        var RED3 = new Float32Array([1, 0.5, 0.5]);
-        var BLUE3 = new Float32Array([.7, .7, 1]);
 
         // dummy material properties
         var materials = new Array();
-        materials.push({ambient: RED3, diffuse: RED3, specular: WHITE3, shininess: 32.0});
-        materials.push({ambient: BLUE3, diffuse: BLUE3, specular: WHITE3, shininess: 16.0});
 
-        // you have 3 point light sources: the number of lights can be hard-coded in the shaders
+        (function () {
+            // be warned that objects are not copied, but their references.
+            var WHITE3 = new Float32Array([1, 1, 1]);
+            var RED3 = new Float32Array([1, 0.5, 0.5]);
+            var BLUE3 = new Float32Array([.7, .7, 1]);
+            //var STEEL = new Float32Array([0.88, 0.87, 0.85]);
+            var STEEL = new Float32Array([225 / 255, 222 / 255, 235 / 255]);
+            //var HEMATITE = new Float32Array([0.16, 0.16, 0.16]);
+            var HEMATITE = new Float32Array([43 / 255, 43 / 255, 43 / 255]);
+
+            materials.push({ambient: STEEL, diffuse: STEEL, specular: STEEL, shininess: 32.0});
+            materials.push({ambient: HEMATITE, diffuse: HEMATITE, specular: HEMATITE, shininess: 16.0});
+            materials.push({ambient: RED3, diffuse: RED3, specular: WHITE3, shininess: 32.0});
+            materials.push({ambient: BLUE3, diffuse: BLUE3, specular: WHITE3, shininess: 16.0});
+
+            // you have 3 point light sources: the number of lights can be hard-coded in the shaders
+        })();
     </script>
 
     <!--
@@ -72,9 +82,9 @@
             shadersList.push("name_of_the_files_without_extension");
     -->
     <script>
-        shadersList.push("5_ward_extended_animated");
-        shadersList.push("5_ward_extended");
         shadersList.push("5_ward");
+        shadersList.push("5_ward_animated");
+        shadersList.push("5_ward_simplified");
         shadersList.push("6_cook");
         shadersList.push("0_tmp");
         shadersList.push("1_ambient");
@@ -93,8 +103,8 @@
 
 <script>
     /*window.onbeforeunload = function () {
-        return "Warning! If you have edited the shaders in the textarea, you need to export them, otherwise your work will be lost.";
-    }*/
+     return "Warning! If you have edited the shaders in the textarea, you need to export them, otherwise your work will be lost.";
+     }*/
     $(document).ready(showShader);
 
 </script>

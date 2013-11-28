@@ -16,50 +16,54 @@ varying vec3 vN;
 varying vec4 vP;
 varying vec3 varyingTangentDirection;
 
+uniform float currentTime;
+
 // Inspiration: https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Brushed_Metal
 
 void main() {
+    float ax = 0.08;
+    float ay = 0.2;
+    float pd = 0.15;
+    float ps = 0.16;
+    float PI = 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628;
+
 
     vec3 pos = vP.xyz;
     vec3 N = normalize(vN);
-    vec3 viewDirection = normalize(-pos); // vector from point to camera
+    vec3 V = normalize(-pos); // vector from point to camera
     vec3 tangentDirection = normalize(varyingTangentDirection);
+    vec3 binormalDirection = normalize(cross(N, tangentDirection)); // Normalize?
 
     vec3 color = globalAmbientLightColor * materialAmbientColor;
+    color *= pd/PI;
 
-    float _AlphaX = 0.8;
-    float _AlphaY = 0.2;
 
-    vec3 binormalDirection = cross(N, tangentDirection);
 
     for (int i = 0; i < LIGHTS; i++) {
-        vec3 vertexToLightSource = lightPosition[i] - pos;
-        vec3 lightDirection = normalize(vertexToLightSource); // vector from point to light
-        vec3 H = normalize(lightDirection + viewDirection); // halfway vector between lightDirection and viewDirection
+        vec3 L = normalize(lightPosition[i] - pos); // vector from point to light
+        //vec3 H = (L + V) / length(L + V); // halfway vector between L and V
+        vec3 vertexToLightSource = L;
 
-        // calc attenuation for spot light source
-        float distance = length(vertexToLightSource);
-        float attenuation = 1.0 / distance; // linear attenuation
-        attenuation *= 2.0; // add more power to the light source
+        vec3 viewDirection = normalize(-pos);
+        //vec3 viewDirection = L;
+        vec3 lightDirection;
+        float attenuation;
 
+        vec3 R = normalize(reflect(-L,N));
+        vec3 H = normalize(L+normalize(V));
 
-        vec3 halfwayVector = normalize(lightDirection + viewDirection);
-        float dotLN = dot(lightDirection, N); // compute this dot product only once
+        float cosphi_r = dot(R,N);
+        float cosphi_i = dot(L,N);
+        float hxax = dot(H,tangentDirection)/ax;
+        float hyay = dot(H,binormalDirection)/ay;
+        float pbd = pd/PI + ps*(1.0/sqrt(cosphi_i*cosphi_r))*(1.0/(4.0*PI*ax*ay))
+                *exp(-2.0*(hxax*hxax+hyay*hyay)/(1.0+dot(H,N)));
 
-        // Diffuse color
-        color += attenuation * materialDiffuseColor * max(0.0, dotLN) * lightColor[i];
+        vec3 HP = normalize(tangentDirection*dot(tangentDirection,H) + binormalDirection*dot(binormalDirection,H));
+        float cosphi = dot(HP, tangentDirection);
 
-        if (dotLN < 0.0) continue; // light source on the wrong side => no specular reflection
-
-        // Specular reflection
-        float dotHN = dot(halfwayVector, N);
-        float dotVN = dot(viewDirection, N);
-        float dotHTAlphaX = dot(halfwayVector, tangentDirection) / _AlphaX;
-        float dotHBAlphaY = dot(halfwayVector, binormalDirection) / _AlphaY;
-
-        color += attenuation * materialSpecularColor
-          * sqrt(max(0.0, dotLN / dotVN))
-          * exp(-2.0 * (dotHTAlphaX * dotHTAlphaX + dotHBAlphaY * dotHBAlphaY) / (1.0 + dotHN)); // * lightColor[i]
+        color += clamp(materialDiffuseColor*lightColor[i]*dot(N,L), 0.0, 1.0);
+        color += pbd*materialSpecularColor*lightColor[i];
     }
     gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
 }
