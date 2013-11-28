@@ -59,7 +59,7 @@ void main() {
             float lambda = dot(H, N);
             float F = pow(1. + dot(E, N), lambda);
             float G = min(1., 2. * min(dot(E, N) * dot(H, N) / dot(E, H), dot(L, N) * dot(H, N) / dot(E, H)));
-            float alpha = acos(max(0.0, dot(N, L)));
+            float alpha = acos(max(0.0, dot(N, H)));
             float D = beckmann(solid_angle, alpha);
 
             float rs = D * F * G / (4. * dot(E, N) * dot(N, L));
