@@ -18,7 +18,7 @@ varying vec3 varyingTangentDirection;
 
 uniform float currentTime;
 
-// Inspiration: https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Brushed_Metal
+// Inspiration: https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Brushed_Metal and https://github.com/minusinf/computer_graphics/tree/master/ex4/source
 // Formula from: https://en.wikipedia.org/w/index.php?title=Specular_highlight&section=7#Ward_anisotropic_distribution
 
 void main() {
@@ -63,10 +63,6 @@ void main() {
         float t3 = exp(-2. * (dotHXax*dotHXax + dotHYay*dotHYay) / (1. + dotHN));
 
         float pbd = t1 * t2 * t3;
-
-
-        vec3 HP = normalize(tangentDirection*dot(tangentDirection,H) + binormalDirection*dot(binormalDirection,H));
-        float cosphi = dot(HP, tangentDirection);
 
         color += pbd * materialSpecularColor * lightColor[i];
     }
