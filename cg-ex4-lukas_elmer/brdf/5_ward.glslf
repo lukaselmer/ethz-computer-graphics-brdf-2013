@@ -19,6 +19,7 @@ varying vec3 varyingTangentDirection;
 uniform float currentTime;
 
 // Inspiration: https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Brushed_Metal
+// Formula from: https://en.wikipedia.org/w/index.php?title=Specular_highlight&section=7#Ward_anisotropic_distribution
 
 void main() {
     float ax = 0.08;
@@ -26,7 +27,6 @@ void main() {
     float pd = 0.15;
     float ps = 0.16;
     float PI = 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628;
-
 
     vec3 pos = vP.xyz;
     vec3 N = normalize(vN);
@@ -38,32 +38,37 @@ void main() {
     color *= pd/PI;
 
 
-
     for (int i = 0; i < LIGHTS; i++) {
         vec3 L = normalize(lightPosition[i] - pos); // vector from point to light
-        //vec3 H = (L + V) / length(L + V); // halfway vector between L and V
-        vec3 vertexToLightSource = L;
+        float dotNL = dot(N, L);
+
+        color += clamp(materialDiffuseColor*lightColor[i]*dotNL, 0.0, 1.0);
 
         vec3 viewDirection = normalize(-pos);
-        //vec3 viewDirection = L;
         vec3 lightDirection;
         float attenuation;
 
         vec3 R = normalize(reflect(-L,N));
         vec3 H = normalize(L+normalize(V));
 
-        float cosphi_r = dot(R,N);
-        float cosphi_i = dot(L,N);
-        float hxax = dot(H,tangentDirection)/ax;
-        float hyay = dot(H,binormalDirection)/ay;
-        float pbd = pd/PI + ps*(1.0/sqrt(cosphi_i*cosphi_r))*(1.0/(4.0*PI*ax*ay))
-                *exp(-2.0*(hxax*hxax+hyay*hyay)/(1.0+dot(H,N)));
+        vec3 X = tangentDirection;
+        vec3 Y = binormalDirection;
+
+        float dotNR = dot(N, R);
+        float dotHXax = dot(H, X) / ax;
+        float dotHYay = dot(H, Y) / ay;
+        float dotHN = dot(H, N);
+        float t1 = 1./(sqrt(dotNL * dotNR));
+        float t2 = dotNL / (4. * PI * ax * ay);
+        float t3 = exp(-2. * (dotHXax*dotHXax + dotHYay*dotHYay) / (1. + dotHN));
+
+        float pbd = t1 * t2 * t3;
+
 
         vec3 HP = normalize(tangentDirection*dot(tangentDirection,H) + binormalDirection*dot(binormalDirection,H));
         float cosphi = dot(HP, tangentDirection);
 
-        color += clamp(materialDiffuseColor*lightColor[i]*dot(N,L), 0.0, 1.0);
-        color += pbd*materialSpecularColor*lightColor[i];
+        color += pbd * materialSpecularColor * lightColor[i];
     }
     gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
 }
