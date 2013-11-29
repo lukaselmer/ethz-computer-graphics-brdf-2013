@@ -15,6 +15,7 @@ varying vec3 vTC;
 varying vec3 vN;
 varying vec4 vP;
 float PI = 3.1415926535897932384626433832795;
+bool usePhong = true;
 
 // inspiration: https://github.com/ashima/webgl-noise
 vec3 c1 = vec3(103.0/255.0, 38.0/255.0, 42.0/255.0);
@@ -140,39 +141,68 @@ float beckmann(float m, float alpha) {
     return exp(-pow(tan(alpha)/m,2.0)) / (PI*m*m*pow(cos(alpha), 4.0));
 }
 
-void main() {
-    vec3 material = getColor();
-    float cook_s = .9;
-    float cook_d = .8;
-    float F0 = 1.;
-    float dwi = 1.;
-    float solid_angle = .3;
-    float refractive_index = 1.5;
 
+void addDiffuse(inout vec3 color){
     vec3 pos = vP.xyz;
     vec3 N = normalize(vN);
-    vec3 E = normalize(-pos); // vector from point to camera
-
-    vec3 color = globalAmbientLightColor * material;
-
     for (int i = 0; i < LIGHTS; i++) {
-        vec3 L = normalize(lightPosition[i] - pos); // vector from position to light
-        vec3 H = normalize(L + E); // halfway vector
+        vec3 L = normalize(lightPosition[i]-pos); // vector from point to light
 
-        if (dot(N,L) >= .0) {
-            float lambda = dot(H, N);
-            float F = pow(1. + dot(E, N), lambda);
-            float G = min(1., 2. * min(dot(E, N) * dot(H, N) / dot(E, H), dot(L, N) * dot(H, N) / dot(E, H)));
-            float alpha = acos(max(0.0, dot(N, H)));
-            float D = beckmann(solid_angle, alpha);
+        // diffuse color
+        color += color * max(0.0, dot(L, N)) * lightColor[i];
 
-            float rs = D * F * G / (4. * dot(E, N) * dot(N, L));
-            vec3 specColor = rs * material * 0.1 * lightColor[i];
-            vec3 diffColor = material * lightColor[i] * max(0., dot(N, L));
-
-            color += clamp(dwi*dot(N,L)*(cook_s*specColor + cook_d*diffColor), 0., 1.);
+        // specular highlights
+        if (materialShininess > 0.0) {
+            vec3 R = normalize(reflect(-L, N)); // vector of reflected light
+            vec3 V = normalize(-pos); // vector from point to camera
+            color += color * pow(max(0.0,dot(R, V)), materialShininess) * lightColor[i];
         }
     }
-    gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
+}
+
+
+void main() {
+    vec3 material = getColor();
+    if(usePhong){
+        vec3 color = globalAmbientLightColor * material;
+        addDiffuse(color);
+        gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
+    }
+    else
+    {
+        vec3 material = getColor();
+        float cook_s = .9;
+        float cook_d = .8;
+        float F0 = 1.;
+        float dwi = 1.;
+        float solid_angle = .3;
+        float refractive_index = 1.5;
+
+        vec3 pos = vP.xyz;
+        vec3 N = normalize(vN);
+        vec3 E = normalize(-pos); // vector from point to camera
+
+        vec3 color = globalAmbientLightColor * material;
+
+        for (int i = 0; i < LIGHTS; i++) {
+            vec3 L = normalize(lightPosition[i] - pos); // vector from position to light
+            vec3 H = normalize(L + E); // halfway vector
+
+            if (dot(N,L) >= .0) {
+                float lambda = dot(H, N);
+                float F = pow(1. + dot(E, N), lambda);
+                float G = min(1., 2. * min(dot(E, N) * dot(H, N) / dot(E, H), dot(L, N) * dot(H, N) / dot(E, H)));
+                float alpha = acos(max(0.0, dot(N, H)));
+                float D = beckmann(solid_angle, alpha);
+
+                float rs = D * F * G / (4. * dot(E, N) * dot(N, L));
+                vec3 specColor = rs * material * 0.1 * lightColor[i];
+                vec3 diffColor = material * lightColor[i] * max(0., dot(N, L));
+
+                color += clamp(dwi*dot(N,L)*(cook_s*specColor + cook_d*diffColor), 0., 1.);
+            }
+        }
+        gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
+    }
 }
 

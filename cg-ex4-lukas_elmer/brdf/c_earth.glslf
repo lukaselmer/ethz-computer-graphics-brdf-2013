@@ -19,6 +19,8 @@ varying vec4 vP;
 float PI = 3.1415926535897932384626433832795;
 
 // inspiration: https://github.com/ashima/webgl-noise
+vec3 color_cyan = vec3(.0/255.0, 200.0/255.0, 255.0/255.0);
+vec3 color_white = vec3(255.0/255.0, 255.0/255.0, 255.0/255.0);
 vec3 color_lightgrey = vec3(252.0/255.0, 252.0/255.0, 252.0/255.0);
 vec3 color_grey = vec3(162.0/255.0, 162.0/255.0, 162.0/255.0);
 vec3 color_dark = vec3(72.0/255.0, 63.0/255.0, 51./255.0);
@@ -198,12 +200,20 @@ vec4 getSurfaceColor() {
         amplitude *= 0.6;
     }
 
+    // ice 2
+    if (p < -1.9)
+        return vec4 (mix (color_cyan, color_white, p+2.4), 0.0);
+
+    // ice
+    if (p < -1.5)
+        return vec4 (mix (color_white, color_dark_blue , p+1.5), 0.0);
+
     // water
     if (p < 0.55)
         return vec4 (mix (color_dark_blue, color_light_blue, p+5.0), 0.0);
 
     // beach
-    if (p < .8)
+    if (p < .85)
         return vec4 (mix (color_sand, color_green, p), p);
 
     // land
