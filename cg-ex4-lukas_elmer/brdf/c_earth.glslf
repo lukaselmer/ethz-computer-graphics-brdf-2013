@@ -10,8 +10,10 @@ uniform float materialShininess;
 uniform vec3 lightPosition[3];
 uniform vec3 lightColor[3];
 uniform vec3 globalAmbientLightColor;
+varying vec3 varyingTangentDirection;
 
 varying vec3 vTC;
+varying vec3 vTCX;
 varying vec3 vN;
 varying vec4 vP;
 float PI = 3.1415926535897932384626433832795;
@@ -28,6 +30,13 @@ vec3 color_green = vec3(140.0/229.0, 194.0/255.0, 81.0/255.0);
 vec3 color_darkgreen = vec3(102.0/229.0, 180.0/255.0, 14.0/255.0);
 
 uniform float currentTime;
+
+
+// some config params
+
+float bumpMappingFactor = 10.;//10.4;
+bool useCook = true;
+
 
 
 vec3 mod289(vec3 x) {
@@ -218,9 +227,9 @@ float bumpMapping(vec3 shift) {
 
 vec3 computeEarthNormals(vec3 N, float height, float cloudiness) {
     float eps = 1.0;
-    float aX = bumpMapping(vec3(eps, 0.0, 0.0)) * 0.1;
-    float aY = bumpMapping(vec3(0.0, eps, 0.0)) * 0.1;
-    float aZ = bumpMapping(vec3(0.0, 0.0, eps)) * 0.1;
+    float aX = bumpMapping(vec3(eps, 0.0, 0.0)) * bumpMappingFactor;
+    float aY = bumpMapping(vec3(0.0, eps, 0.0)) * bumpMappingFactor;
+    float aZ = bumpMapping(vec3(0.0, 0.0, eps)) * bumpMappingFactor;
 
     mat3 rotX = mat3(1., 0., 0.,
                      0., cos(aX), -sin(aX),
@@ -242,57 +251,116 @@ vec3 computeEarthNormals(vec3 N, float height, float cloudiness) {
 vec3 step = vec3(0.003, 0.008, 0.07);
 
 void main() {
-    float cook_s = .9;
-    float cook_d = .8;
-    float F0 = 1.;
-    float dwi = 1.;
-    float solid_angle = .3;
-    float refractive_index = 1.5;
+    if(useCook){
+        float cook_s = .9;
+        float cook_d = .8;
+        float F0 = 1.;
+        float dwi = 1.;
+        float solid_angle = .3;
+        float refractive_index = 1.5;
 
 
-    vec4 cloudColor = clamp(computeClouds(step*currentTime), 0.0, 1.0);
-    bool is_cloud = (cloudColor.w > 0.0);
+        vec4 cloudColor = clamp(computeClouds(step*currentTime), 0.0, 1.0);
+        bool is_cloud = (cloudColor.w > 0.0);
 
-    vec4 surfaceColor = getSurfaceColor();
-    bool is_ocean = (surfaceColor.w == 0.0);
+        vec4 surfaceColor = getSurfaceColor();
+        bool is_ocean = (surfaceColor.w == 0.0);
 
 
 
-    vec3 pos = vP.xyz;
-    vec3 N = normalize(vN);
-    vec3 E = normalize(-pos); // vector from point to camera
+        vec3 pos = vP.xyz;
+        vec3 N = normalize(vN);
+        vec3 E = normalize(-pos); // vector from point to camera
 
-    if (!is_ocean) {
-        N = computeEarthNormals(N, surfaceColor.w, cloudColor.w);
-    }
+        if (!is_ocean) {
+            N = computeEarthNormals(N, surfaceColor.w, cloudColor.w);
+        }
 
-    //vec3 color = vec3(0., 0., 0.);
+        //vec3 color = vec3(0., 0., 0.);
 
-    vec3 color = globalAmbientLightColor * (cloudColor.xyz + surfaceColor.xyz) * 0.4;
+        vec3 color = globalAmbientLightColor * (cloudColor.xyz + surfaceColor.xyz) * .4;
 
-    for (int i = 0; i < 1; i++) { // there is only one sun...
-        vec3 L = normalize(lightPosition[i] - pos); // vector from position to light
-        vec3 H = normalize(L + E); // halfway vector
+        for (int i = 0; i < LIGHTS; i++) { // there is only one sun...
+            vec3 L = normalize(lightPosition[i] - pos); // vector from position to light
+            vec3 H = normalize(L + E); // halfway vector
 
-        if (dot(N,L) >= .0) {
-            float lambda = dot(H, N);
-            float F = pow(1. + dot(E, N), lambda);
-            float G = min(1., 2. * min(dot(E, N) * dot(H, N) / dot(E, H), dot(L, N) * dot(H, N) / dot(E, H)));
-            float alpha = acos(max(0.0, dot(N, H)));
-            float D = beckmann(solid_angle, alpha);
+            if (dot(N,L) >= .0) {
+                float lambda = dot(H, N);
+                float F = pow(1. + dot(E, N), lambda);
+                float G = min(1., 2. * min(dot(E, N) * dot(H, N) / dot(E, H), dot(L, N) * dot(H, N) / dot(E, H)));
+                float alpha = acos(max(0.0, dot(N, H)));
+                float D = beckmann(solid_angle, alpha);
 
-            float rs = D * F * G / (4. * dot(E, N) * dot(N, L));
-            vec3 diffColor = (cloudColor.xyz + surfaceColor.xyz) * lightColor[i] * max(0., dot(N, L));
+                float rs = D * F * G / (4. * dot(E, N) * dot(N, L));
+                vec3 diffColor = (cloudColor.xyz + surfaceColor.xyz) * lightColor[0] * max(0., dot(N, L));
 
-            if (is_ocean){
-                vec3 specColor = rs * color_dark_blue * lightColor[i];
-                color += clamp(dwi*dot(N,L)*(cook_s*specColor + cook_d*diffColor), 0., 1.);
-            }else{
-                vec3 specColor = rs * (cloudColor.xyz + surfaceColor.xyz) * lightColor[i];
-                color += clamp(dwi*dot(N,L)*(cook_d*diffColor), 0., 1.);
+                if (is_ocean){
+                    vec3 specColor = rs * color_dark_blue * lightColor[0];
+                    color += clamp(dwi*dot(N,L)*(cook_s*specColor + cook_d*diffColor), 0., 1.);
+                }else{
+                    vec3 specColor = rs * (cloudColor.xyz + surfaceColor.xyz) * lightColor[0];
+                    color += clamp(dwi*dot(N,L)*(cook_d*diffColor), 0., 1.);
+                }
             }
         }
+        gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
+    }else{
+        float ax = 0.08;
+        float ay = 0.2;
+        float pd = 0.15;
+        float ps = 0.16;
+        float PI = 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628;
+
+        vec3 pos = vP.xyz;
+        vec3 N = normalize(vN);
+        vec3 V = normalize(-pos); // vector from point to camera
+
+        vec4 cloudColor = clamp(computeClouds(step*currentTime), 0.0, 1.0);
+        bool is_cloud = (cloudColor.w > 0.0);
+
+        vec4 surfaceColor = getSurfaceColor();
+        bool is_ocean = (surfaceColor.w == 0.0);
+
+        if (!is_ocean) {
+            N = computeEarthNormals(N, surfaceColor.w, cloudColor.w);
+        }
+
+        vec3 tangentDirection = normalize(varyingTangentDirection);
+        vec3 binormalDirection = normalize(cross(N, tangentDirection)); // Normalize?
+
+        vec3 color = (cloudColor.xyz + surfaceColor.xyz) * materialAmbientColor * .4;
+        color *= pd/PI;
+
+
+        for (int i = 0; i < LIGHTS; i++) {
+            vec3 L = normalize(lightPosition[i] - pos); // vector from point to light
+            float dotNL = dot(N, L);
+
+            color += clamp((cloudColor.xyz + surfaceColor.xyz)*lightColor[i]*dotNL, 0.0, 1.0);
+
+            vec3 viewDirection = normalize(-pos);
+            vec3 lightDirection;
+            float attenuation;
+
+            vec3 R = normalize(reflect(-L,N));
+            vec3 H = normalize(L+normalize(V));
+
+            vec3 X = tangentDirection;
+            vec3 Y = binormalDirection;
+
+            float dotNR = dot(N, R);
+            float dotHXax = dot(H, X) / ax;
+            float dotHYay = dot(H, Y) / ay;
+            float dotHN = dot(H, N);
+            float t1 = 1./(sqrt(dotNL * dotNR));
+            float t2 = dotNL / (4. * PI * ax * ay);
+            float t3 = exp(-2. * (dotHXax*dotHXax + dotHYay*dotHYay) / (1. + dotHN));
+
+            float pbd = t1 * t2 * t3;
+
+            //color += pbd * (cloudColor.xyz + surfaceColor.xyz) * lightColor[i];
+        }
+        gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
     }
-    gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
 }
 

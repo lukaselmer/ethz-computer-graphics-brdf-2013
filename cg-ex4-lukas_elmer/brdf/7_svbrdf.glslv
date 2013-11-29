@@ -16,5 +16,6 @@ void main(void) {
     gl_Position = projectionMatrix * vP;
     vTC = textureCoord;
     vN = normalMatrix * vertexNormal;
+    //varyingTangentDirection = normalize(vec3(modelViewMatrix * vec4(vec3(vTC), 0.0)));
     varyingTangentDirection = cross(vN, vec3(0., 0., 1.));
 }
