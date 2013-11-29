@@ -34,7 +34,9 @@ uniform float currentTime;
 
 // some config params
 
-float bumpMappingFactor = 10.;//10.4;
+//float bumpMappingFactor = 10.;//10.4;
+float bumpMappingFactor = 3.;//10.4;
+bool usePhong = true;
 bool useCook = true;
 
 
@@ -250,8 +252,44 @@ vec3 computeEarthNormals(vec3 N, float height, float cloudiness) {
 
 vec3 step = vec3(0.003, 0.008, 0.07);
 
+
+
 void main() {
-    if(useCook){
+    if(usePhong){
+
+        vec4 cloudColor = clamp(computeClouds(step*currentTime), 0.0, 1.0);
+        bool is_cloud = (cloudColor.w > 0.0);
+
+        vec4 surfaceColor = getSurfaceColor();
+        bool is_ocean = (surfaceColor.w == 0.0);
+
+        vec3 pos = vP.xyz;
+        vec3 N = normalize(vN);
+        vec3 E = normalize(-pos); // vector from point to camera
+
+        if (!is_ocean) {
+            N = computeEarthNormals(N, surfaceColor.w, cloudColor.w);
+        }
+
+        vec3 color = globalAmbientLightColor * (cloudColor.xyz + surfaceColor.xyz) * .4;
+
+        for (int i = 0; i < LIGHTS; i++) {
+            vec3 L = normalize(lightPosition[i]-pos); // vector from point to light
+
+            // diffuse color
+            color += (cloudColor.xyz + surfaceColor.xyz) * max(0.0, dot(L, N)) * lightColor[0];
+
+            // specular highlights
+            if (materialShininess > 0.0) {
+                vec3 R = normalize(reflect(-L, N)); // vector of reflected light
+                vec3 V = normalize(-pos); // vector from point to camera
+                color += (cloudColor.xyz + surfaceColor.xyz) * pow(max(0.0,dot(R, V)), materialShininess) * lightColor[0];
+            }
+        }
+
+        gl_FragColor = clamp(vec4(color, 1.), 0., 1.);
+    }
+    else if(useCook){
         float cook_s = .9;
         float cook_d = .8;
         float F0 = 1.;
