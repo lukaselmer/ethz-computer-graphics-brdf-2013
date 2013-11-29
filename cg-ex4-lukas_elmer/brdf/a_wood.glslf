@@ -108,6 +108,7 @@ float cnoise(vec3 P) {
     return 2.2 * n_xyz;
 }
 
+
 vec3 getColor() {
     float scale = 1.5;
     float shift = 0.0;
@@ -125,6 +126,35 @@ vec3 getColor() {
     }
 
     c = cos(sqrt(x*x + y*y*1.2 + 1.4)*4.0 + c);
+    c = c-floor(c) * 1.5;
+
+    if(c < 0.45)
+        return c2;
+    else if(c < 0.5)
+        return mix(c1, c2, c);
+    else if (c < 0.75)
+        return mix(c2, c1, c);
+    else
+        return mix(c3, c1, c);
+}
+
+vec3 getColor2() {
+    float scale = 1.;
+    float shift = 1000.0;
+    float x = scale * vTC.x + shift + 100000.0;
+    float y = scale * vTC.y + shift - 100000.0;
+    float z = scale * vTC.z + shift + .0;
+
+    float frequency = 10.;
+    float amplitude = .5;
+    float c = 0.;
+    for (float i = 0.; i < 20.; i++) {
+        c += amplitude * cnoise((x+y)/8. + frequency * vec3(x+10.2,y,z)); //  + (x+.4)*y/900.
+        amplitude *= 0.7;
+        frequency *= 2.;
+    }
+
+    c = cos(x/2. + sqrt(x*x + y*y*1.2 + 1.4 + z*z)*2.0 + c*.6 + z*1. + y * 10. + x) ;
     c = c-floor(c) * 1.5;
 
     if(c < 0.45)
@@ -163,7 +193,7 @@ void addDiffuse(inout vec3 color){
 }
 
 void main() {
-    vec3 material = getColor();
+    vec3 material = false ? getColor() : getColor2();
     if(usePhong){
         vec3 color = globalAmbientLightColor * material;
         addDiffuse(color);
