@@ -4,6 +4,8 @@ Computer Graphics Exercise 4 - BRDF and Procedural Textures
 General
 -------
 
+The project can be found under https://github.com/lukaselmer/ethz-computer-graphics-brdf-2013
+
 Two additional colors have been added for steel and hematite.
 
 Inspiration for Perlin noise: https://github.com/ashima/webgl-noise
