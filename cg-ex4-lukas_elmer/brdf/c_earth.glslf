@@ -160,7 +160,7 @@ vec3 computeLand(float heightP) {
         amplitude *= 0.75;
     }
 
-    if(heightP > .97)
+    if(heightP > 1.5)
         return color_lightgrey;
 
     //desert
@@ -173,26 +173,26 @@ vec3 computeLand(float heightP) {
 
 vec4 getSurfaceColor() {
     float p = 0.0;
-    float amplitude = 2.0;
-    float frequency = 2.0;
+    float amplitude = 2.1;
+    float frequency = .45;
     float scale = 1.0;
-    float shift = 0.0;
+    float shift = 110.0;
     float x = scale * vTC.x + shift;
     float y = scale * vTC.y + shift;
     float z = scale * vTC.z + shift;
 
     for (int i = 0; i < 10; i++) {
         p += amplitude * cnoise(frequency * vec3(x,y,z));
-        frequency *= 1.85;
+        frequency *= 1.83;
         amplitude *= 0.6;
     }
 
     // water
-    if (p < 0.45)
+    if (p < 0.55)
         return vec4 (mix (color_dark_blue, color_light_blue, p+5.0), 0.0);
 
     // beach
-    if (p < 0.65)
+    if (p < .8)
         return vec4 (mix (color_sand, color_green, p), p);
 
     // land
@@ -201,16 +201,16 @@ vec4 getSurfaceColor() {
 
 float bumpMapping(vec3 shift) {
     float p = 0.0;
-    float amplitude = 1.25;
-    float frequency = 0.5;
+    float amplitude = 1.24;
+    float frequency = 0.51;
     float scale = 1.0;
     float x = shift.x + vTC.x * scale;
     float y = shift.y + vTC.y * scale;
     float z = shift.z + vTC.z * scale;
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 20; i++) {
         p += amplitude * (cnoise(frequency * vec3(x,y,z)));
-        frequency *= 2.0;
+        frequency *= 2.1;
         amplitude *= 0.5;
     }
     return p;
@@ -249,10 +249,6 @@ void main() {
     float solid_angle = .3;
     float refractive_index = 1.5;
 
-    vec3 pos = vP.xyz;
-    vec3 N = normalize(vN);
-    vec3 E = normalize(-pos); // vector from point to camera
-
 
     vec4 cloudColor = clamp(computeClouds(step*currentTime), 0.0, 1.0);
     bool is_cloud = (cloudColor.w > 0.0);
@@ -260,15 +256,21 @@ void main() {
     vec4 surfaceColor = getSurfaceColor();
     bool is_ocean = (surfaceColor.w == 0.0);
 
+
+
+    vec3 pos = vP.xyz;
+    vec3 N = normalize(vN);
+    vec3 E = normalize(-pos); // vector from point to camera
+
     if (!is_ocean) {
         N = computeEarthNormals(N, surfaceColor.w, cloudColor.w);
     }
 
     //vec3 color = vec3(0., 0., 0.);
 
-    vec3 color = globalAmbientLightColor * (cloudColor.xyz + surfaceColor.xyz) ;
+    vec3 color = globalAmbientLightColor * (cloudColor.xyz + surfaceColor.xyz) * 0.4;
 
-    for (int i = 0; i < LIGHTS; i++) { // there is only one sun...
+    for (int i = 0; i < 1; i++) { // there is only one sun...
         vec3 L = normalize(lightPosition[i] - pos); // vector from position to light
         vec3 H = normalize(L + E); // halfway vector
 
@@ -287,7 +289,7 @@ void main() {
                 color += clamp(dwi*dot(N,L)*(cook_s*specColor + cook_d*diffColor), 0., 1.);
             }else{
                 vec3 specColor = rs * (cloudColor.xyz + surfaceColor.xyz) * lightColor[i];
-                color += clamp(dwi*dot(N,L)*(cook_s*specColor * .1 + cook_d*diffColor), 0., 1.);
+                color += clamp(dwi*dot(N,L)*(cook_d*diffColor), 0., 1.);
             }
         }
     }
