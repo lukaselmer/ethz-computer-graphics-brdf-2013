@@ -80,7 +80,7 @@
             shadersList.push("name_of_the_files_without_extension");
     -->
     <script>
-        shadersList.push("b_marble");
+        shadersList.push("c_earth");
         shadersList.push("0_tmp");
         shadersList.push("1_ambient");
         shadersList.push("2_lambertian");
@@ -90,9 +90,9 @@
         shadersList.push("5_ward_animated");
         shadersList.push("5_ward_simplified");
         shadersList.push("6_cook");
-        shadersList.push("7_svbrdf");
+        shadersList.push("7_svbrdf")
         shadersList.push("a_wood");
-        shadersList.push("c_earth");
+        shadersList.push("b_marble");
     </script>
 
 
@@ -103,7 +103,9 @@
     /*window.onbeforeunload = function () {
      return "Warning! If you have edited the shaders in the textarea, you need to export them, otherwise your work will be lost.";
      }*/
-    $(document).ready(showShader);
+    $(document).ready(function(){
+        showShader();
+    });
 
 </script>
 

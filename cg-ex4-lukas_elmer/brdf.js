@@ -9,7 +9,7 @@ var shaders = new Array();
 var currentShader = 0;
 
 var currentMaterial = 0;
-var showTeapot = true;
+var showTeapot = false;
 
 var showCode = false;
 
