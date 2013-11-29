@@ -22,19 +22,10 @@ float PI = 3.1415926535897932384626433832795;
 // Inspiration: https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Brushed_Metal and https://github.com/minusinf/computer_graphics/tree/master/ex4/source
 // Formula from: https://en.wikipedia.org/w/index.php?title=Specular_highlight&section=7#Cook.E2.80.93Torrance_model
 
-float schlick(float refractive_index, float theta) {
-    float f0 = (1.0-refractive_index)/(1.0+refractive_index);
-    return f0 + (1.0-f0)*pow(1.0-cos(theta),5.0);
-}
-
 float beckmann(float m, float alpha) {
     //return 1.0/(m*m*pow(cos(alpha), 4.0))*exp(-pow(tan(alpha)/m,2.0));
     //return exp(-pow(tan(alpha)/m,2.0)) / (m*m*pow(cos(alpha), 4.0));
     return exp(-pow(tan(alpha)/m,2.0)) / (PI*m*m*pow(cos(alpha), 4.0));
-}
-
-float min0(float f){
-    return max(0.0, f);
 }
 
 void main() {

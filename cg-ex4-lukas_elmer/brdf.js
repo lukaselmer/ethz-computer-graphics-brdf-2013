@@ -118,7 +118,7 @@ function compileShader() {
 			gl.disableVertexAttribArray(shader.vertexNormalAttribute);
 		if (shader.textureCoordAttribute >= 0)
 			gl.disableVertexAttribArray(shader.textureCoordAttribute);
-        if (shader.textureCoordAttribute >= 0)
+        if (shader.currentTimeAttribute >= 0)
             gl.disableVertexAttribArray(shader.currentTimeAttribute);
 	}
 
@@ -135,7 +135,7 @@ function compileShader() {
 			gl.enableVertexAttribArray(shader.vertexNormalAttribute);
 		if (shader.textureCoordAttribute >= 0)
 			gl.enableVertexAttribArray(shader.textureCoordAttribute);
-        if (shader.textureCoordAttribute >= 0)
+        if (shader.currentTimeAttribute >= 0)
             gl.enableVertexAttribArray(shader.currentTimeAttribute);
 	}
 }

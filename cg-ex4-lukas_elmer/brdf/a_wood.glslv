@@ -1,12 +1,12 @@
 attribute vec3 vertexPosition;
 attribute vec3 vertexNormal;
-attribute vec2 textureCoord;
+attribute vec3 textureCoord;
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat3 normalMatrix;
 
-varying vec2 vTC;
+varying vec3 vTC;
 varying vec3 vN;
 varying vec4 vP;
 varying vec3 varyingTangentDirection;
