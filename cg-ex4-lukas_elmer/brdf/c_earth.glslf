@@ -17,6 +17,7 @@ varying vec4 vP;
 float PI = 3.1415926535897932384626433832795;
 
 // inspiration: https://github.com/ashima/webgl-noise
+vec3 color_lightgrey = vec3(252.0/255.0, 252.0/255.0, 252.0/255.0);
 vec3 color_grey = vec3(162.0/255.0, 162.0/255.0, 162.0/255.0);
 vec3 color_dark = vec3(72.0/255.0, 63.0/255.0, 51./255.0);
 vec3 color_bright = vec3(241.0/255.0, 242.0/255.0, 251.0/255.0);
@@ -143,7 +144,7 @@ vec4 computeClouds(vec3 v) {
     return vec4(0.0, 0.0, 0.0, 0.0);
 }
 
-vec3 computeLand() {
+vec3 computeLand(float heightP) {
     float p = 0.0;
     float amplitude = 1.5;
     float frequency = 0.5;
@@ -158,6 +159,9 @@ vec3 computeLand() {
         frequency *= 2.0;
         amplitude *= 0.75;
     }
+
+    if(heightP > .97)
+        return color_lightgrey;
 
     //desert
     if (p < 0.0)
@@ -177,22 +181,22 @@ vec4 getSurfaceColor() {
     float y = scale * vTC.y + shift;
     float z = scale * vTC.z + shift;
 
-    for (int i = 0; i < 22; i++) {
+    for (int i = 0; i < 10; i++) {
         p += amplitude * cnoise(frequency * vec3(x,y,z));
         frequency *= 1.85;
         amplitude *= 0.6;
     }
 
     // water
-    if (p < 0.85)
+    if (p < 0.45)
         return vec4 (mix (color_dark_blue, color_light_blue, p+5.0), 0.0);
 
     // beach
-    if (p < 0.9)
+    if (p < 0.65)
         return vec4 (mix (color_sand, color_green, p), p);
 
     // land
-    return vec4 (computeLand(), p);
+    return vec4(computeLand(p), p);
 }
 
 float bumpMapping(vec3 shift) {
@@ -256,9 +260,8 @@ void main() {
     vec4 surfaceColor = getSurfaceColor();
     bool is_ocean = (surfaceColor.w == 0.0);
 
-    vec3 normalDirection = N;
-    if (!is_ocean && !is_cloud) {
-        normalDirection = computeEarthNormals(normalDirection, surfaceColor.w, cloudColor.w);
+    if (!is_ocean) {
+        N = computeEarthNormals(N, surfaceColor.w, cloudColor.w);
     }
 
     //vec3 color = vec3(0., 0., 0.);
@@ -280,10 +283,11 @@ void main() {
             vec3 diffColor = (cloudColor.xyz + surfaceColor.xyz) * lightColor[i] * max(0., dot(N, L));
 
             if (is_ocean){
-                vec3 specColor = rs * color_dark_blue * 0.1 * lightColor[i];
+                vec3 specColor = rs * color_dark_blue * lightColor[i];
                 color += clamp(dwi*dot(N,L)*(cook_s*specColor + cook_d*diffColor), 0., 1.);
             }else{
-                color += clamp(dwi*dot(N,L)*(cook_d*diffColor), 0., 1.);
+                vec3 specColor = rs * (cloudColor.xyz + surfaceColor.xyz) * lightColor[i];
+                color += clamp(dwi*dot(N,L)*(cook_s*specColor * .1 + cook_d*diffColor), 0., 1.);
             }
         }
     }
