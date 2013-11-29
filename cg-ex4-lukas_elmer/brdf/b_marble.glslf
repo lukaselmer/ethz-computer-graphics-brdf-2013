@@ -106,11 +106,11 @@ float cnoise(vec3 P) {
 }
 
 vec3 getColor() {
-    float scale = 20.0;
-    float shift = 0.0;
-    float x = scale * vTC.x + shift + 100000.0;
-    float y = scale * vTC.y + shift - 100000.0;
-    float z = scale * vTC.z + shift + 0.0;
+    float scale = 2.;
+    float shift = 0.;
+    float x = scale * vTC.x + shift + 100000.;
+    float y = scale * vTC.y + shift - 100000.;
+    float z = scale * vTC.z + shift + 0.;
 
 
     float frequency = 0.4;
