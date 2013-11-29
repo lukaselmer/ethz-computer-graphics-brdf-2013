@@ -6,6 +6,8 @@ General
 
 The project can be found under https://github.com/lukaselmer/ethz-computer-graphics-brdf-2013
 
+A live demo can be found under https://brdf-eth.renuo.ch
+
 Two additional colors have been added for steel and hematite.
 
 Inspiration for Perlin noise: https://github.com/ashima/webgl-noise
