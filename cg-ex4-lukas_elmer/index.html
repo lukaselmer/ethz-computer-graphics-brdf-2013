@@ -29,10 +29,11 @@
             var RED3 = new Float32Array([1, 0.5, 0.5]);
             var BLUE3 = new Float32Array([.7, .7, 1]);
             var STEEL = new Float32Array([225 / 255, 222 / 255, 232 / 255]);
+            var STEEL2 = new Float32Array([185 / 255, 182 / 255, 192 / 255]);
             var HEMATITE = new Float32Array([43 / 255, 43 / 255, 43 / 255]);
 
-            materials.push({ambient: STEEL, diffuse: STEEL, specular: STEEL, shininess: 32.0});
-            materials.push({ambient: HEMATITE, diffuse: HEMATITE, specular: HEMATITE, shininess: 16.0});
+            materials.push({ambient: STEEL, diffuse: STEEL, specular: STEEL2    , shininess: 32.0});
+            materials.push({ambient: HEMATITE, diffuse: HEMATITE, specular: WHITE3, shininess: 16.0});
             materials.push({ambient: RED3, diffuse: RED3, specular: WHITE3, shininess: 32.0});
             materials.push({ambient: BLUE3, diffuse: BLUE3, specular: WHITE3, shininess: 16.0});
 
@@ -80,7 +81,6 @@
             shadersList.push("name_of_the_files_without_extension");
     -->
     <script>
-        shadersList.push("c_earth");
         shadersList.push("1_ambient");
         shadersList.push("2_lambertian");
         shadersList.push("3_phong");
@@ -93,6 +93,7 @@
         shadersList.push("7_svbrdf_animated");
         shadersList.push("a_wood");
         shadersList.push("b_marble");
+        shadersList.push("c_earth");
     </script>
 
 

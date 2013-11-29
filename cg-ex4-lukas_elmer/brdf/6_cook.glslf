@@ -34,7 +34,7 @@ void main() {
     float F0 = 1.;
     float dwi = 1.;
     float solid_angle = .3;
-    float refractive_index = 1.5;
+    float refractive_index = 5.;
 
     vec3 pos = vP.xyz;
     vec3 N = normalize(vN);
