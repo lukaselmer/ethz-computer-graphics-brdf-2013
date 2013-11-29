@@ -49,9 +49,9 @@ Additional implementation with Cook model.
 
 ### C. Earth
 
-Uses Perlin noise for the clouds and the islands. The clouds are animated.
+Uses 3D Perlin noise for the clouds, the islands, the icebergs, the whater (dark and light blue) and the bump mapping. The clouds are animated.
 Bump mapping is implemented, but doesn't look very realistic because the earth is still round around the edges. This is because it is a "fake" implementation with only changing the normals at certain points.
-Additional implementation: Icebergs (as "islands", like the north pole) and glaciers (on the normal islands).
+Additionally implemented: Icebergs (as "islands", like the north pole) and glaciers (on the normal islands).
 Additional implementation with Cook model and Ward model.
 
 
