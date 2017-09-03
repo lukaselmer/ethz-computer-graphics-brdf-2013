@@ -6,7 +6,7 @@ General
 
 The project can be found under https://github.com/lukaselmer/ethz-computer-graphics-brdf-2013
 
-A live demo can be found under https://brdf-demo.elmermx.ch/
+A live demo can be found under https://brdf.elmermx.ch/
 
 Two additional colors have been added for steel and hematite.
 
