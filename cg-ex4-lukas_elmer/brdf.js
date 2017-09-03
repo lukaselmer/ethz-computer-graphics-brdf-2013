@@ -71,6 +71,7 @@ function init() {
 	document.onmouseup = handleMouseUp;
 	canvas.onmousemove = handleMouseMove;
 	document.onkeydown = keyboard;
+	showHelp();
 	window.addEventListener('resize', reshape, false);
 
     requestAnimFrame(animate);
@@ -412,6 +413,15 @@ function handleMouseMove(event) {
 	mat4.transpose(rotationMatrix);	// because opengl rotation matrix is column-major?
 }
 
+function showHelp() {
+	showMessage("************************");
+	showMessage("<enter>: change model");
+	showMessage("<space>: change material");
+	showMessage("<mouse drag>: rotate");
+	showMessage("e: export as image");
+	showMessage("************************");
+}
+
 // keyboard event handling
 
 function keyboard(event) {
@@ -420,27 +430,21 @@ function keyboard(event) {
 
 	// returning false prevents further propagation of the event
 
-    if(event.ctrlKey){
-        if (keyStr == " ") {
-            currentMaterial = (currentMaterial + 1) % materials.length;
-            return false;
-        } else if (keyCode == 13) {
-            showTeapot = !showTeapot;
-            return false;
-        } else if (keyStr.toLowerCase() == "e") {
-            exportPNG();
-            return false;
-        } else if (keyStr.toLowerCase() == "h") {
-            showMessage("************************");
-            showMessage("<enter>: change model");
-            showMessage("<space>: change material");
-            showMessage("<mouse drag>: rotate");
-            showMessage("e: export as image");
-            showMessage("************************");
-        }
-    }else {
-        return true;
-    }
+	// if(event.ctrlKey){
+	if (keyStr == " ") {
+		currentMaterial = (currentMaterial + 1) % materials.length;
+		return false;
+	} else if (keyCode == 13) {
+		showTeapot = !showTeapot;
+		return false;
+	} else if (keyStr.toLowerCase() == "e") {
+		exportPNG();
+		return false;
+	} else if (keyStr.toLowerCase() == "h") {
+		showHelp();
+	} else {
+		return true;
+	}
 }
 
 // helper functions
