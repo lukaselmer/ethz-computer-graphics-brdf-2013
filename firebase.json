@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "cg-ex4-lukas_elmer",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
